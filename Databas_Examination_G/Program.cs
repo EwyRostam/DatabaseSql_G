@@ -1,4 +1,5 @@
 ﻿using Databas_Examination_G.Contexts;
+using Databas_Examination_G.Menus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,7 +17,7 @@ namespace Databas_Examination_G
 
                
                 using var sp = services.BuildServiceProvider();
-                var menuService = sp.GetService<MenuService>();
+                var menuService = sp.GetService<MainMenu>();
 
             }).Build();
 

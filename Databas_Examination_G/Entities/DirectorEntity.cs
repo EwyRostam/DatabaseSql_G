@@ -6,10 +6,15 @@ internal class DirectorEntity
 {
     public int Id { get; set; }
     public string FirstName { get; set; } = null!;
-    public string LastName { get; set;} = null!;
+    public string LastName { get; set; } = null!;
 
-    [Column(TypeName = "")]
+    public string Fullname => $"{FirstName} {LastName}";
     public int? BirthYear { get; set; }
+
+    public int? DeathYear { get; set; }
+
+    [Column(TypeName = "nvarchar(300)")]
+    public string? Description { get; set; }
     public ICollection<MovieEntity>? Movies { get; set; }
 }
     
