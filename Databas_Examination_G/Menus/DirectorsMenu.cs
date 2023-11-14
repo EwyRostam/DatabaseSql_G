@@ -84,14 +84,25 @@ namespace Databas_Examination_G.Menus
             if (lastName.Length > 0)
                 director.LastName = char.ToUpper(lastName[0]) + lastName.Substring(1);
 
-            await _repo.CreateAsync(director);
+            string fullName = $"{firstName} {lastName}";
 
-            Console.Clear();
-            Console.WriteLine("-----------------------------------------------");
-            Console.WriteLine("New director has been added.");
-            Console.ReadKey();
+            var result = await _repo.ExistsAsync(x => x.Fullname == fullName);
+            if (result == true)
+            {
+                await _repo.CreateAsync(director);
+                Console.Clear();
+                Console.WriteLine("-----------------------------------------------");
+                Console.WriteLine("The director has been added!");
+                Console.ReadKey();
 
-            await MainMenuAsync();
+                await MainMenuAsync();
+            }
+            else
+            {
+                Console.WriteLine("The director already exists!");
+                Console.ReadKey();
+                await MainMenuAsync();
+            }
         }
 
         private async Task ListAllMenu()
