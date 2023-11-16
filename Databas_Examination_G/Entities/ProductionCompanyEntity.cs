@@ -1,6 +1,6 @@
 ﻿namespace Databas_Examination_G.Entities;
 
-internal class ProductionCompanyEntity
+public class ProductionCompanyEntity
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;

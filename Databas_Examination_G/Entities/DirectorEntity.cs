@@ -2,7 +2,7 @@
 
 namespace Databas_Examination_G.Entities;
 
-internal class DirectorEntity
+public class DirectorEntity
 {
     public int Id { get; set; }
     public string FirstName { get; set; } = null!;

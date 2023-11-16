@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Databas_Examination_G.Entities;
 
-internal class MovieGenreEntity
+public class MovieGenreEntity
 {
   
     [Key, Column(Order = 0)]

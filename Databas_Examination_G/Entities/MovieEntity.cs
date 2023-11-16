@@ -2,7 +2,7 @@
 
 namespace Databas_Examination_G.Entities
 {
-    internal class MovieEntity
+    public class MovieEntity
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;
@@ -17,6 +17,9 @@ namespace Databas_Examination_G.Entities
 
         public int MovieGenreId { get; set; }
         public MovieGenreEntity MovieGenre { get; set; } = null!;
+        public ICollection<GenreEntity> Genres { get; set; } = new List<GenreEntity>();
+
+
 
     }
 }
