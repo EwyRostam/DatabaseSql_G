@@ -1,8 +1,10 @@
 ﻿using Databas_Examination_G.Contexts;
 using Databas_Examination_G.Menus;
+using Databas_Examination_G.Repositories;
+using Databas_Examination_G.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+
 
 namespace Databas_Examination_G
 {
@@ -11,17 +13,36 @@ namespace Databas_Examination_G
         private static readonly string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\ewyro\Nackademin\Databas_16\Databas_Examination_G\Databas_Examination_G\Contexts\Databases\DB_G.mdf;Integrated Security=True;Connect Timeout=30";
         static async Task Main(string[] args)
         {
-            var host = Host.CreateDefaultBuilder(args).ConfigureServices(services =>
-            {
-                services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
+            var services = new ServiceCollection();
 
-               
-                using var sp = services.BuildServiceProvider();
-                var menuService = sp.GetService<MainMenu>();
+            services.AddDbContext<DataContext>(options => options.UseSqlServer(connectionString));
 
-            }).Build();
+            services.AddScoped<DirectorsMenu>();
+            services.AddScoped<GenresMenu>();
+            services.AddScoped<MainMenu>();
+            services.AddScoped<MoviesMenu>();
+            services.AddScoped<ProductionCompaniesMenu>();
+                
+            services.AddScoped<DirectorRepository>();
+            services.AddScoped<GenreRepository>();
+            services.AddScoped<MovieRepository>();
+            services.AddScoped<ProductionCompanyRepository>();
+            services.AddScoped<RatingRepository>();
 
-            await host.RunAsync();
+            services.AddScoped<DirectorService>();
+            services.AddScoped<GenreService>();
+            services.AddScoped<ProducerService>();
+            services.AddScoped<RatingService>();
+
+
+
+
+            var sp = services.BuildServiceProvider();
+            var mainMenu = sp.GetRequiredService<MainMenu>();
+            await mainMenu.MainMenuAsync();
         }
+
+            
+        
     }
 }

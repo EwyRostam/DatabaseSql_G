@@ -5,15 +5,13 @@ internal class MainMenu
     private readonly DirectorsMenu _directorsMenu;
     private readonly GenresMenu _genresMenu;
     private readonly MoviesMenu _moviesMenu;
-    private readonly MovieGenresMenu _movieGenresMenu;
     private readonly ProductionCompaniesMenu _productionCompaniesMenu;
 
-    public MainMenu(DirectorsMenu directorsMenu, GenresMenu genresMenu, MoviesMenu moviesMenu, MovieGenresMenu movieGenresMenu, ProductionCompaniesMenu productionCompaniesMenu)
+    public MainMenu(DirectorsMenu directorsMenu, GenresMenu genresMenu, MoviesMenu moviesMenu, ProductionCompaniesMenu productionCompaniesMenu)
     {
         _directorsMenu = directorsMenu;
         _genresMenu = genresMenu;
         _moviesMenu = moviesMenu;
-        _movieGenresMenu = movieGenresMenu;
         _productionCompaniesMenu = productionCompaniesMenu;
     }
 

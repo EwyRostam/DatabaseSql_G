@@ -15,9 +15,12 @@ namespace Databas_Examination_G.Entities
         public int DirectorId { get; set; }
         public DirectorEntity Director { get; set; } = null!;
 
-        public int MovieGenreId { get; set; }
-        public MovieGenreEntity MovieGenre { get; set; } = null!;
-        public ICollection<GenreEntity> Genres { get; set; } = new List<GenreEntity>();
+        public int GenreId { get; set; }
+        public GenreEntity Genre { get; set; } = null!;
+
+        public int RatingId { get; set; }
+        public RatingEntity? Rating { get; set; } 
+       
 
 
 

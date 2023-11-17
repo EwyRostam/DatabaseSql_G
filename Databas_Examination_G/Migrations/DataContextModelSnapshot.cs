@@ -49,7 +49,7 @@ namespace Databas_Examination_G.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Entities");
+                    b.ToTable("Directors");
                 });
 
             modelBuilder.Entity("Databas_Examination_G.Entities.GenreEntity", b =>
@@ -60,16 +60,13 @@ namespace Databas_Examination_G.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("MovieGenreId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Genre");
+                    b.ToTable("Genres");
                 });
 
             modelBuilder.Entity("Databas_Examination_G.Entities.MovieEntity", b =>
@@ -86,7 +83,7 @@ namespace Databas_Examination_G.Migrations
                     b.Property<int>("DirectorId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MovieGenreId")
+                    b.Property<int>("GenreId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -96,6 +93,9 @@ namespace Databas_Examination_G.Migrations
                     b.Property<int>("ProducerId")
                         .HasColumnType("int");
 
+                    b.Property<int>("RatingId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Year")
                         .HasColumnType("int");
 
@@ -103,30 +103,13 @@ namespace Databas_Examination_G.Migrations
 
                     b.HasIndex("DirectorId");
 
+                    b.HasIndex("GenreId");
+
                     b.HasIndex("ProducerId");
 
+                    b.HasIndex("RatingId");
+
                     b.ToTable("Movies");
-                });
-
-            modelBuilder.Entity("Databas_Examination_G.Entities.MovieGenreEntity", b =>
-                {
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
-
-                    b.Property<int>("GenreId")
-                        .HasColumnType("int")
-                        .HasColumnOrder(1);
-
-                    b.HasKey("MovieId", "GenreId");
-
-                    b.HasIndex("GenreId")
-                        .IsUnique();
-
-                    b.HasIndex("MovieId")
-                        .IsUnique();
-
-                    b.ToTable("MovieGenres");
                 });
 
             modelBuilder.Entity("Databas_Examination_G.Entities.ProductionCompanyEntity", b =>
@@ -143,22 +126,23 @@ namespace Databas_Examination_G.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductionCompany");
+                    b.ToTable("ProductionCompanies");
                 });
 
-            modelBuilder.Entity("GenreEntityMovieEntity", b =>
+            modelBuilder.Entity("Databas_Examination_G.Entities.RatingEntity", b =>
                 {
-                    b.Property<int>("GenresId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("MoviesId")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Rating")
                         .HasColumnType("int");
 
-                    b.HasKey("GenresId", "MoviesId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("MoviesId");
-
-                    b.ToTable("GenreEntityMovieEntity");
+                    b.ToTable("Ratings");
                 });
 
             modelBuilder.Entity("Databas_Examination_G.Entities.MovieEntity", b =>
@@ -169,49 +153,31 @@ namespace Databas_Examination_G.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Databas_Examination_G.Entities.GenreEntity", "Genre")
+                        .WithMany("Movies")
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Databas_Examination_G.Entities.ProductionCompanyEntity", "Producer")
                         .WithMany("Movies")
                         .HasForeignKey("ProducerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Databas_Examination_G.Entities.RatingEntity", "Rating")
+                        .WithMany("Movies")
+                        .HasForeignKey("RatingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Director");
-
-                    b.Navigation("Producer");
-                });
-
-            modelBuilder.Entity("Databas_Examination_G.Entities.MovieGenreEntity", b =>
-                {
-                    b.HasOne("Databas_Examination_G.Entities.GenreEntity", "Genre")
-                        .WithOne("MovieGenre")
-                        .HasForeignKey("Databas_Examination_G.Entities.MovieGenreEntity", "GenreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Databas_Examination_G.Entities.MovieEntity", "Movie")
-                        .WithOne("MovieGenre")
-                        .HasForeignKey("Databas_Examination_G.Entities.MovieGenreEntity", "MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("Genre");
 
-                    b.Navigation("Movie");
-                });
+                    b.Navigation("Producer");
 
-            modelBuilder.Entity("GenreEntityMovieEntity", b =>
-                {
-                    b.HasOne("Databas_Examination_G.Entities.GenreEntity", null)
-                        .WithMany()
-                        .HasForeignKey("GenresId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Databas_Examination_G.Entities.MovieEntity", null)
-                        .WithMany()
-                        .HasForeignKey("MoviesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Rating");
                 });
 
             modelBuilder.Entity("Databas_Examination_G.Entities.DirectorEntity", b =>
@@ -221,17 +187,15 @@ namespace Databas_Examination_G.Migrations
 
             modelBuilder.Entity("Databas_Examination_G.Entities.GenreEntity", b =>
                 {
-                    b.Navigation("MovieGenre")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Databas_Examination_G.Entities.MovieEntity", b =>
-                {
-                    b.Navigation("MovieGenre")
-                        .IsRequired();
+                    b.Navigation("Movies");
                 });
 
             modelBuilder.Entity("Databas_Examination_G.Entities.ProductionCompanyEntity", b =>
+                {
+                    b.Navigation("Movies");
+                });
+
+            modelBuilder.Entity("Databas_Examination_G.Entities.RatingEntity", b =>
                 {
                     b.Navigation("Movies");
                 });

@@ -7,9 +7,12 @@ namespace Databas_Examination_G.Repositories;
 
 internal class DirectorRepository : Repo<DirectorEntity>
 {
+    private readonly DataContext _context;
     public DirectorRepository(DataContext context) : base(context)
     {
+        _context = context;
     }
+
 }
 
 internal class GenreRepository : Repo<GenreEntity>
@@ -33,7 +36,7 @@ internal class MovieRepository : Repo<MovieEntity>
     {
         return await _context.Movies
             .Include(x => x.Director)
-            .Include(x => x.MovieGenre).ThenInclude(x => x.Genre)
+            .Include(x => x.Genre)
             .Include(x => x.Producer)
             .ToListAsync();
     }
@@ -42,7 +45,7 @@ internal class MovieRepository : Repo<MovieEntity>
     {
         var result = await _context.Movies
             .Include(x => x.Director)
-            .Include(x => x.MovieGenre).ThenInclude(x => x.Genre)
+            .Include(x => x.Genre)
             .Include(x => x.Producer).FirstOrDefaultAsync();
 
         if (result != null)
@@ -52,9 +55,9 @@ internal class MovieRepository : Repo<MovieEntity>
     }
 }
 
-internal class MovieGenreRepository : Repo<MovieGenreEntity>
+internal class RatingRepository : Repo<RatingEntity>
 {
-    public MovieGenreRepository(DataContext context) : base(context)
+    public RatingRepository(DataContext context) : base(context)
     {
     }
 }

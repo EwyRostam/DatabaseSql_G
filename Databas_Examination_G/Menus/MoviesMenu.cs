@@ -1,24 +1,26 @@
 ﻿using Databas_Examination_G.Entities;
 using Databas_Examination_G.Repositories;
+using Databas_Examination_G.Services;
 using System.Diagnostics;
+
 
 namespace Databas_Examination_G.Menus
 {
     internal class MoviesMenu
     {
         private readonly MovieRepository _movieRepo;
-        private readonly MovieGenreRepository _movieGenreRepo;
-        private readonly GenreRepository _genreRepo;
-        private readonly ProductionCompanyRepository _producerRepo;
-        private readonly DirectorRepository _directorRepo;
+        private readonly RatingService _ratingService;
+        private readonly GenreService _genreService;
+        private readonly ProducerService _producerService;
+        private readonly DirectorService _directorService;
 
-        public MoviesMenu(MovieRepository movieRepo, MovieGenreRepository movieGenreRepo, GenreRepository genreRepo, ProductionCompanyRepository producerRepo, DirectorRepository directorRepo)
+        public MoviesMenu(MovieRepository movieRepo, RatingService ratingService, GenreService genreService, ProducerService producerService, DirectorService directorService)
         {
             _movieRepo = movieRepo;
-            _movieGenreRepo = movieGenreRepo;
-            _genreRepo = genreRepo;
-            _producerRepo = producerRepo;
-            _directorRepo = directorRepo;
+            _ratingService = ratingService;
+            _genreService = genreService;
+            _producerService = producerService;
+            _directorService = directorService;
         }
 
         internal async Task MainMenuAsync()
@@ -33,7 +35,7 @@ namespace Databas_Examination_G.Menus
                 Console.WriteLine("3. Show details for specific movie");
                 Console.WriteLine("4. Update a movie");
                 Console.WriteLine("5. Delete a movie");
-                Console.WriteLine("0. Close program");
+                Console.WriteLine("0. Go back to main menu");
                 Console.Write("Choose one of the above alternatives (0-5): ");
                 var option = Console.ReadLine();
 
@@ -80,7 +82,7 @@ namespace Databas_Examination_G.Menus
             Console.WriteLine("-----------------------");
 
             var movie = new MovieEntity(); //Instance of new movie
-            var movieGenre = new MovieGenreEntity();
+            
 
 
             Console.Write("Name of movie: ");
@@ -91,78 +93,73 @@ namespace Databas_Examination_G.Menus
             string description = Console.ReadLine()!.Trim();
             movie.Description = description;
 
+            Console.Write("Rate the movie from 1-5: ");
+            var rating = int.Parse(Console.ReadLine()!.Trim());
+
             Console.Write("Year of release [xxxx]: ");
             var year = int.Parse(Console.ReadLine()!.Trim());
             movie.Year = year;
 
             Console.Write("Genre: ");
             var genre = Console.ReadLine()!.Trim();
-            movie.MovieGenre.Genre.Name = genre;
+            
 
             Console.Write("Production company: ");
             var producer = Console.ReadLine()!.Trim();
-            movie.Producer.Name = producer;
+           
 
             Console.Write("First name of director: ");
             string firstName = Console.ReadLine()!.Trim().ToLower();
             if (firstName.Length > 0)
-                movie.Director.FirstName = char.ToUpper(firstName[0]) + firstName.Substring(1);
+                firstName = char.ToUpper(firstName[0]) + firstName.Substring(1);
 
             Console.Write("Last name of director: ");
             string lastName = Console.ReadLine()!.Trim().ToLower();
             if (lastName.Length > 0)
-                movie.Director.LastName = char.ToUpper(lastName[0]) + lastName.Substring(1);
-
-            string fullName = $"{firstName} {lastName}";
+                lastName = char.ToUpper(lastName[0]) + lastName.Substring(1);
 
 
-            var exists = await _movieGenreRepo.ExistsAsync(x => x.Genre.Name == genre);
-            var existProducer = await _producerRepo.ExistsAsync(x => x.Name == producer);
-            var existDirector = await _directorRepo.ExistsAsync(x => x.Fullname == fullName);
-            if (exists != true)
+            var newGenre = new GenreEntity()
+            { Name = genre };
+            newGenre = await _genreService.CreateGenreAsync(newGenre);
+
+            var newRating = new RatingEntity()
+            { Rating = rating };
+            newRating = await _ratingService.CreateRatingAsync(newRating);
+
+            var newProducer = new ProductionCompanyEntity()
+            { Name = producer };
+            newProducer = await _producerService.CreateProducerAsync(newProducer);
+
+            var newDirector = new DirectorEntity()
+            { FirstName = firstName, LastName = lastName };
+            newDirector = await _directorService.CreateDirectorAsync(newDirector);
+
+            var existMovie = await _movieRepo.ExistsAsync(x => x.Name == movieName);
+
+            if (existMovie != true)
             {
-                var newGenre = new GenreEntity()
-                { Name = genre };
-                await _genreRepo.CreateAsync(newGenre);
-            }
-            
-            else if (existProducer != true) 
-            
-            {
-                var newProducer = new ProductionCompanyEntity()
-                { Name = producer };
-                await _producerRepo.CreateAsync(newProducer);
-            }
 
-            else if (existDirector != true)
+                movie.GenreId = newGenre.Id;
+                movie.ProducerId = newProducer.Id;
+                movie.DirectorId = newDirector.Id;
+                movie.RatingId = newRating.Id;
 
-            {
-                var newDirector = new DirectorEntity()
-                { FirstName = firstName, LastName = lastName };
-                await _directorRepo.CreateAsync(newDirector);
+                await _movieRepo.CreateAsync(movie);
+                Console.Clear();
+                Console.WriteLine("-----------------------------------------------");
+                Console.WriteLine("The movie has been added!");
+                Console.ReadKey();
+
+                await MainMenuAsync();
             }
-
             else
             {
-                var result = await _movieRepo.ExistsAsync(x => x.Name == movieName);
-                if (result == true)
-                {
-
-                    await _movieRepo.CreateAsync(movie);
-                    Console.Clear();
-                    Console.WriteLine("-----------------------------------------------");
-                    Console.WriteLine("The movie has been added!");
-                    Console.ReadKey();
-
-                    await MainMenuAsync();
-                }
-                else
-                {
-                    Console.WriteLine("The movie already exists!");
-                    Console.ReadKey();
-                    await MainMenuAsync();
-                }
+                Console.WriteLine("The movie already exists!");
+                Console.ReadKey();
+                await MainMenuAsync();
             }
+            
                       
         }
 
@@ -174,7 +171,7 @@ namespace Databas_Examination_G.Menus
 
             var list = await _movieRepo.GetAllAsync();
 
-            if (list != null)
+            if (list != null && list.Any())
             {
                 foreach (var movie in list) //Loop for all movies in list
                 {
@@ -216,7 +213,7 @@ namespace Databas_Examination_G.Menus
             if (movie != null)
             {
                 Console.WriteLine();
-                Console.WriteLine($"{movie.Name} - {movie.Year} - {movie.MovieGenre.Genre.Name}");
+                Console.WriteLine($"{movie.Name} - {movie.Year} -- {movie.Genre.Name}");
                 Console.WriteLine("***********************************");
                 Console.WriteLine($"{movie.Description}");
                 Console.WriteLine();
@@ -254,6 +251,7 @@ namespace Databas_Examination_G.Menus
                         Console.WriteLine("4. Update year");
                         Console.WriteLine("5. Update production company");
                         Console.WriteLine("6. Update director");
+                        Console.WriteLine("7. Update rating");
                         Console.WriteLine("0. Go back");
                         Console.Write("Choose one of the above options (0-5): ");
                         var option = Console.ReadLine();
@@ -282,7 +280,7 @@ namespace Databas_Examination_G.Menus
                                 Console.Write("Enter new genre: ");
                                  string genre = Console.ReadLine()!.Trim().ToLower();
                                 if (genre.Length > 0)
-                                    movie.MovieGenre.Genre.Name = char.ToUpper(genre[0]) + genre.Substring(1);
+                                    movie.Genre.Name = char.ToUpper(genre[0]) + genre.Substring(1);
                                 Console.Clear();
 
                                 Console.WriteLine("The genre has now been updated!");
@@ -316,6 +314,13 @@ namespace Databas_Examination_G.Menus
                                     movie.Director.LastName = char.ToUpper(lastName[0]) + lastName.Substring(1);
                                 Console.Clear();
                                 Console.WriteLine("Lastname has now been updated!");
+                                break;
+
+                            case "7":
+                                Console.Write("Enter new rating from 1-5: ");
+                                movie.Rating!.Rating = int.Parse(Console.ReadLine()!.Trim());
+                                Console.Clear();
+                                Console.WriteLine("Rating has been updated!");
                                 break;
 
                             case "0":
@@ -354,7 +359,7 @@ namespace Databas_Examination_G.Menus
             if (movie != null)
             {
                 Console.WriteLine();
-                Console.WriteLine($"{movie.Name} - {movie.Year} - {movie.MovieGenre.Genre.Name}");
+                Console.WriteLine($"{movie.Name} - {movie.Year} - {movie.Genre.Name}");
                 Console.WriteLine("***********************************");
                 Console.WriteLine($"{movie.Description}");
                 Console.WriteLine();

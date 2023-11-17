@@ -10,14 +10,11 @@ public class DataContext : DbContext
 
     }
 
-    public DbSet<DirectorEntity> Entities { get; set; }
-    public DbSet<GenreEntity> Genre { get; set; }
-   public  DbSet<MovieEntity> Movies { get; set; }
-    public DbSet<MovieGenreEntity> MovieGenres { get; set; }
-    public DbSet<ProductionCompanyEntity> ProductionCompany { get; set; }
+    public DbSet<DirectorEntity> Directors { get; set; }
+    public DbSet<GenreEntity> Genres { get; set; }
+    public  DbSet<MovieEntity> Movies { get; set; }
+    public DbSet<RatingEntity> Ratings { get; set; }
+    public DbSet<ProductionCompanyEntity> ProductionCompanies { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<MovieGenreEntity>().HasKey(x => new { x.MovieId, x.GenreId });
-    }
+
 }

@@ -1,16 +1,16 @@
 ﻿using Databas_Examination_G.Entities;
-using Databas_Examination_G.Repositories;
+using Databas_Examination_G.Services;
 using System.Diagnostics;
 
 namespace Databas_Examination_G.Menus
 {
     internal class ProductionCompaniesMenu
     {
-        ProductionCompanyRepository _repo;
+        ProducerService _service;
 
-        public ProductionCompaniesMenu(ProductionCompanyRepository repo)
+        public ProductionCompaniesMenu(ProducerService service)
         {
-            _repo = repo;
+            _service = service;
         }
 
         internal async Task MainMenuAsync()
@@ -77,10 +77,10 @@ namespace Databas_Examination_G.Menus
             Console.Write("Name of production company: ");
             string name = Console.ReadLine()!.Trim();
 
-            var result = await _repo.ExistsAsync(x => x.Name == name);
-            if (result == true)
+           var result = await _service.CreateProducerAsync(productionCompany);
+            if (result != null)
             {
-                await _repo.CreateAsync(productionCompany);
+                
                 Console.Clear();
                 Console.WriteLine("-----------------------------------------------");
                 Console.WriteLine("New production company has been added.");
@@ -105,7 +105,7 @@ namespace Databas_Examination_G.Menus
             Console.WriteLine("Show all production companies");
             Console.WriteLine("---------------------");
 
-            var list = await _repo.GetAllAsync();
+            var list = await _service.GetAllAsync();
 
             if (list != null)
             {
@@ -141,7 +141,7 @@ namespace Databas_Examination_G.Menus
             Console.Write("Name of production company: ");
             string name = Console.ReadLine()!.Trim();
 
-            var company = await _repo.GetSpecificAsync(company => company.Name == name); //Compares the email with the email with the companys in the list and returns the first one matching.
+            var company = await _service.GetSpecificAsync(name); //Compares the email with the email with the companys in the list and returns the first one matching.
 
             if (company != null)
             {
@@ -200,11 +200,11 @@ namespace Databas_Examination_G.Menus
 
                     } while (exit == false);
 
-                    await _repo.UpdateAsync(company);
+                    await _service.UpdateAsync(company);
 
                 }
                 else 
-                { Console.WriteLine($"Could not find any production company with the name \"{company.Name}\""); }
+                { Console.WriteLine($"Could not find any production company with the name \"{company!.Name}\""); }
 
             }
             catch (Exception ex) { Debug.WriteLine(ex.Message); }
@@ -219,7 +219,7 @@ namespace Databas_Examination_G.Menus
             string name = Console.ReadLine()!.Trim().ToLower();
           
 
-            var company = await _repo.GetSpecificAsync(company => company.Name == name);
+            var company = await _service.GetSpecificAsync(name);
 
             if (company != null)
             {
@@ -228,7 +228,7 @@ namespace Databas_Examination_G.Menus
                 Console.WriteLine("-------------------------------------------------");
                 Console.WriteLine("Press any key to delete production company");
                 Console.ReadKey();
-                await _repo.DeleteAsync(x => x.Name == name);
+                await _service.DeleteAsync(name);
                 Console.Clear();
 
 

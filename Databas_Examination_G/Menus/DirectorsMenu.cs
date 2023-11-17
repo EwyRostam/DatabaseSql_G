@@ -1,16 +1,17 @@
 ﻿using Databas_Examination_G.Entities;
 using Databas_Examination_G.Repositories;
+using Databas_Examination_G.Services;
 using System.Diagnostics;
 
 namespace Databas_Examination_G.Menus
 {
     internal class DirectorsMenu
     {
-        private readonly DirectorRepository _repo;
+        private readonly DirectorService _service;
 
-        public DirectorsMenu(DirectorRepository repo)
+        public DirectorsMenu(DirectorService service)
         {
-            _repo = repo;
+            _service = service;
         }
 
         internal async Task MainMenuAsync()
@@ -84,12 +85,18 @@ namespace Databas_Examination_G.Menus
             if (lastName.Length > 0)
                 director.LastName = char.ToUpper(lastName[0]) + lastName.Substring(1);
 
-            string fullName = $"{firstName} {lastName}";
+            Console.Write("Description: ");
+            director.Description = Console.ReadLine()!.Trim();
 
-            var result = await _repo.ExistsAsync(x => x.Fullname == fullName);
-            if (result == true)
+            Console.Write("Year of birth [xxxx]: ");
+            director.BirthYear = int.Parse(Console.ReadLine()!.Trim());
+
+            Console.Write("Year of death [xxxx] (optional): ");
+            director.DeathYear = int.Parse(Console.ReadLine()!.Trim());
+
+            var result = await _service.CreateDirectorAsync(director);
+            if (result != null)
             {
-                await _repo.CreateAsync(director);
                 Console.Clear();
                 Console.WriteLine("-----------------------------------------------");
                 Console.WriteLine("The director has been added!");
@@ -111,14 +118,14 @@ namespace Databas_Examination_G.Menus
             Console.WriteLine("Show all directors");
             Console.WriteLine("---------------------");
 
-            var list = await _repo.GetAllAsync();
+            var list = await _service.GetAllAsync();
 
             if (list != null)
             {
                 foreach (var director in list) //Loop for all directors in list
                 {
                     Console.WriteLine($"{director.FirstName} {director.LastName}");
-                    Console.WriteLine();
+
                 }
                 Console.ReadKey();
             }
@@ -155,20 +162,27 @@ namespace Databas_Examination_G.Menus
             string fullName = $"{firstName} {lastName}";
 
 
-            var director = await _repo.GetSpecificAsync(director => director.Fullname == fullName); //Compares the email with the email with the directors in the list and returns the first one matching.
+            var director = await _service.GetSpecificAsync(firstName, lastName); //Compares the email with the email with the directors in the list and returns the first one matching.
 
             if (director != null)
             {
-                Console.WriteLine();
-                Console.WriteLine($"{director.FirstName} {director.LastName} -- {director.BirthYear} - {director.DeathYear}");
+                Console.Clear();
+                Console.WriteLine($"{director.FirstName} {director.LastName}");
+                Console.WriteLine($"{ director.BirthYear} - { director.DeathYear}");
                 Console.WriteLine($"{director.Description}");
                 Console.WriteLine();
-                Console.WriteLine($"Movies:");
-                foreach(var movie in director.Movies!)
+                Console.ReadKey();
+                if (director.Movies != null)
                 {
-                    Console.WriteLine($"{movie.Name}");
+                    Console.WriteLine($"Movies:");
+                    foreach (var movie in director.Movies!)
+                    {
+                        Console.WriteLine($"{movie.Name}");
+                    }
+                    Console.ReadKey();
+                    
                 }
-                Console.ReadLine();
+                
                 return director;
             }
 
@@ -185,9 +199,9 @@ namespace Databas_Examination_G.Menus
         {
             try
             {
-                var exit = false;
-
                 DirectorEntity director = await ListSpecificMenu(); //Gets a director from list through "ListSpecificMenu"
+                
+                var exit = false;
 
                 if (director != null)
                 {
@@ -255,7 +269,7 @@ namespace Databas_Examination_G.Menus
 
                     } while (exit == false);
 
-                    await _repo.UpdateAsync(director);
+                    await _service.UpdateAsync(director);
 
                 }
 
@@ -278,7 +292,7 @@ namespace Databas_Examination_G.Menus
             string fullName = $"{firstName} {lastName}";
 
 
-            var director = await _repo.GetSpecificAsync(director => director.Fullname == fullName);
+            var director = await _service.GetSpecificAsync(firstName, lastName);
 
             if (director != null)
             {
@@ -287,7 +301,7 @@ namespace Databas_Examination_G.Menus
                 Console.WriteLine("-------------------------------------------------");
                 Console.WriteLine("Press any key to delete director");
                 Console.ReadKey();
-                await _repo.DeleteAsync(x => x.Fullname == fullName);
+                await _service.DeleteAsync(firstName, lastName);
                 Console.Clear();
 
 
@@ -298,7 +312,7 @@ namespace Databas_Examination_G.Menus
                 }
                 Thread.Sleep(250);
                 Console.Clear();
-                Console.WriteLine($"The director \"{director.Fullname}\"  has now been deleted.");
+                Console.WriteLine($"The director \"{fullName}\"  has now been deleted.");
                 Thread.Sleep(2000);
                 Console.Clear();
             }

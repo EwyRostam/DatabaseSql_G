@@ -1,16 +1,16 @@
 ﻿using Databas_Examination_G.Entities;
-using Databas_Examination_G.Repositories;
+using Databas_Examination_G.Services;
 using System.Diagnostics;
 
 namespace Databas_Examination_G.Menus
 {
     internal class GenresMenu
     {
-        private readonly GenreRepository _repo;
+        private readonly GenreService _service;
 
-        public GenresMenu(GenreRepository repo)
+        public GenresMenu(GenreService service)
         {
-            _repo = repo;
+            _service = service;
         }
 
         internal async Task MainMenuAsync()
@@ -79,10 +79,9 @@ namespace Databas_Examination_G.Menus
             if (genreName.Length > 0)
                 genre.Name = char.ToUpper(genreName[0]) + genreName.Substring(1); //Makes genre letter big if the name is longes than one letter
 
-            var result = await _repo.ExistsAsync(x => x.Name == genreName);
-            if (result == true)
+            var result = await _service.CreateGenreAsync(genre);
+            if (result != null)
             {
-                await _repo.CreateAsync(genre);
                 Console.Clear();
                 Console.WriteLine("-----------------------------------------------");
                 Console.WriteLine("New genre has been added.");
@@ -107,7 +106,7 @@ namespace Databas_Examination_G.Menus
             Console.WriteLine("Show all genres");
             Console.WriteLine("---------------------");
 
-            var list = await _repo.GetAllAsync();
+            var list = await _service.GetAllAsync();
 
             if (list != null)
             {
@@ -146,7 +145,7 @@ namespace Databas_Examination_G.Menus
                 genreName = char.ToUpper(genreName[0]) + genreName.Substring(1);
 
 
-            var genre = await _repo.GetSpecificAsync(genre => genre.Name == genreName); //Compares the email with the email with the genres in the list and returns the first one matching.
+            var genre = await _service.GetSpecificAsync(genreName); //Compares the email with the email with the genres in the list and returns the first one matching.
 
             if (genre != null)
             {
@@ -207,7 +206,7 @@ namespace Databas_Examination_G.Menus
 
                     } while (exit == false);
 
-                    await _repo.UpdateAsync(genre);
+                    await _service.UpdateAsync(genre);
 
                 }
 
@@ -220,14 +219,13 @@ namespace Databas_Examination_G.Menus
             Console.Clear();
             Console.WriteLine("Search for the genre you want to delete");
             Console.WriteLine("------------------------------------");
-            Console.Write("Firstname: ");
             Console.Write("Name of genre: ");
             string genreName = Console.ReadLine()!.Trim().ToLower();
             if (genreName.Length > 0)
                 genreName = char.ToUpper(genreName[0]) + genreName.Substring(1);
 
 
-            var genre = await _repo.GetSpecificAsync(genre => genre.Name == genreName);
+            var genre = await _service.GetSpecificAsync(genreName);
 
             if (genre != null)
             {
@@ -236,7 +234,7 @@ namespace Databas_Examination_G.Menus
                 Console.WriteLine("-------------------------------------------------");
                 Console.WriteLine("Press any key to delete genre");
                 Console.ReadKey();
-                await _repo.DeleteAsync(x => x.Name == genreName);
+                await _service.DeleteAsync(genreName);
                 Console.Clear();
 
 
