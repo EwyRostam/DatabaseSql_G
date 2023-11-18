@@ -119,6 +119,7 @@ namespace Databas_Examination_G.Menus
                 lastName = char.ToUpper(lastName[0]) + lastName.Substring(1);
 
 
+
             var newGenre = new GenreEntity()
             { Name = genre };
             newGenre = await _genreService.CreateGenreAsync(newGenre);
@@ -140,10 +141,10 @@ namespace Databas_Examination_G.Menus
             if (existMovie != true)
             {
 
-                movie.GenreId = newGenre.Id;
-                movie.ProducerId = newProducer.Id;
-                movie.DirectorId = newDirector.Id;
-                movie.RatingId = newRating.Id;
+                movie.Genre = newGenre;
+                movie.Producer = newProducer;
+                movie.Director = newDirector;
+                movie.Rating = newRating;
 
                 await _movieRepo.CreateAsync(movie);
                 Console.Clear();
