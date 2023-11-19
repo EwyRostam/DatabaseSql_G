@@ -80,23 +80,16 @@ namespace Databas_Examination_G.Menus
                 genre.Name = char.ToUpper(genreName[0]) + genreName.Substring(1); //Makes genre letter big if the name is longes than one letter
 
             var result = await _service.CreateGenreAsync(genre);
-            if (result != null)
-            {
-                Console.Clear();
-                Console.WriteLine("-----------------------------------------------");
-                Console.WriteLine("New genre has been added.");
-                Console.ReadKey();
+            
+            
+            Console.Clear();
+            Console.WriteLine("-----------------------------------------------");
+            Console.WriteLine("Genre has been added!");
+            Console.ReadKey();
 
-                await MainMenuAsync();
-            }
-            else
-            {
-                Console.WriteLine("Genre already exists!");
-                Console.ReadKey();
-                await MainMenuAsync();
-            }
+            await MainMenuAsync();
+            
            
-
            
         }
 

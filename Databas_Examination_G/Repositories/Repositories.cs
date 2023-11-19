@@ -43,15 +43,15 @@ internal class MovieRepository : Repo<MovieEntity>
 
     public override async Task<MovieEntity> GetSpecificAsync(Expression<Func<MovieEntity, bool>> predicate)
     {
-        var result = await _context.Movies
-            .Include(x => x.Director)
-            .Include(x => x.Genre)
-            .Include(x => x.Producer).FirstOrDefaultAsync();
+     
+        
+        var item = await _context.Movies
+        .Include(x => x.Director)
+        .Include(x => x.Genre)
+        .Include(x => x.Producer).FirstOrDefaultAsync(predicate);
 
-        if (result != null)
-            return result;
-
-        return null!;
+            return item ?? null!;
+ 
     }
 }
 

@@ -1,5 +1,4 @@
 ﻿
-
 namespace Databas_Examination_G.Entities
 {
     public class MovieEntity
@@ -19,7 +18,7 @@ namespace Databas_Examination_G.Entities
         public GenreEntity Genre { get; set; } = null!;
 
         public int RatingId { get; set; }
-        public RatingEntity? Rating { get; set; } 
+        public RatingEntity Rating { get; set; } = null!;
        
 
 

@@ -33,6 +33,7 @@ namespace Databas_Examination_G
             services.AddScoped<GenreService>();
             services.AddScoped<ProducerService>();
             services.AddScoped<RatingService>();
+            services.AddScoped<MovieService>();
 
 
 

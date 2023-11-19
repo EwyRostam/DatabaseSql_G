@@ -49,8 +49,8 @@ internal class RatingService
     {
         try
         {
-            var producer = await _repo.GetSpecificAsync(x => x.Rating == rating);
-            return producer ?? null!;
+            var result = await _repo.GetSpecificAsync(x => x.Rating == rating);
+            return result ?? null!;
         }
         catch (Exception ex) { Console.WriteLine(ex.Message); }
         return null!;
@@ -60,8 +60,8 @@ internal class RatingService
     {
         try
         {
-            var producer = await _repo.UpdateAsync(entity);
-            return producer;
+            var result = await _repo.UpdateAsync(entity);
+            return result;
 
         }
         catch (Exception ex) { Console.WriteLine(ex.Message); }

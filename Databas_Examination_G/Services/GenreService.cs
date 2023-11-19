@@ -24,7 +24,7 @@ internal class GenreService
                 return genreEntity;
             }
             else
-            return null!;
+            return entity;
 
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
